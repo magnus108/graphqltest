@@ -7,7 +7,7 @@ const APP_PORT = 3000;
 
 const app = Express();
 
-app.use(Cors());
+app.use(Cors({origin: true, credentials: true, maxAge: 86400}));
 
 app.use('/graphql', GraphHTTP({
   schema: Schema,

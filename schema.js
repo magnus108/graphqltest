@@ -131,6 +131,21 @@ const Count = new GraphQLObjectType({
   }
 });
 
+const Token = new GraphQLObjectType({
+  name: 'Token',
+  description: 'This represents a Token',
+  fields: () => {
+    return {
+      uuid: {
+        type: GraphQLString,
+        resolve (token) {
+          return token.uuid
+        }
+      }
+    }
+  }
+});
+
 const Person = new GraphQLObjectType({
   name: 'Person',
   description: 'This represents a Person',
@@ -226,6 +241,25 @@ const Mutation = new GraphQLObjectType({
   description: 'Functions to set stuff',
   fields () {
     return {
+      loginPerson: {
+        type: Token,
+        args: {
+          email: {
+            type: new GraphQLNonNull(GraphQLString)
+          },
+          travelId: {
+            type: new GraphQLNonNull(GraphQLInt)
+          }
+        },
+        async resolve (source, args) {
+          const {email, travelId} = args;
+          const travel = await Db.models.travel.findById(travelId);
+          const person = await travel.getPerson({where: {email: email}});
+          return Db.models.token.create({
+            uuid: person.email
+          })
+        }
+      },
       addPerson: {
         type: Person,
         args: {

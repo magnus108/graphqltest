@@ -2,6 +2,8 @@ import Sequelize from 'sequelize';
 import Faker from 'faker';
 import _ from 'lodash';
 
+Faker.seed(100);
+
 const Conn = new Sequelize(
   'postgres',
   'postgres',
@@ -11,6 +13,19 @@ const Conn = new Sequelize(
     host: 'localhost'
   }
 );
+
+const Token = Conn.define('token', {
+  uuid: {
+    type: Sequelize.STRING,
+    allowNull: false
+  }
+});
+
+const Permission = Conn.define('permission', {});
+
+const Group = Conn.define('group' {});
+
+
 
 const Person = Conn.define('person', {
   email: {
@@ -44,14 +59,20 @@ const Travel = Conn.define('travel', {
   }
 });
 
-// Relations
+
 Person.hasMany(Travel, {onDelete: 'cascade', onUpdate: 'cascade'});
 Travel.belongsTo(Person, {onUpdate: 'cascade'});
+Person.hasMany(Token, {onDelete: 'cascade', onUpdate: 'cascade'});
+Token.belongsTo(Person, {onUpdate: 'cascade'});
 
-Faker.seed(100);
+Permission.belongTo(Group, {onUpdate: 'cascade'});
+Group.hasMany(Permission, {onDelete: 'cascade', onUpdate: 'cascade'});
+
+Group.
+
 
 Conn.sync({ force: true }).then(()=> {
-  _.times(10, ()=> {
+  _.times(1, ()=> {
     return Person.create({
       firstname: Faker.name.firstName(),
       email: Faker.internet.email()
