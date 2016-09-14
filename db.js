@@ -14,6 +14,7 @@ const Conn = new Sequelize(
   }
 );
 
+//accesstoken
 const Token = Conn.define('token', {
   uuid: {
     type: Sequelize.STRING,
@@ -21,11 +22,48 @@ const Token = Conn.define('token', {
   }
 });
 
-const Permission = Conn.define('permission', {});
 
-const Group = Conn.define('group' {});
+/*
+//acl
+const Acl = Conn.define('acl', {
+  resource: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  property: {
+    type: Sequelize.STRING
+  },
+  accessType: {
+    type: Sequelize.STRING
+  },
+  permission: {
+    type: Sequelize.STRING
+  },
+  principalType: {
+    type: Sequelize.STRING
+  },
+  principalId: {
+    type: Sequlize.STRING
+  }
+}
 
+*/
 
+const RolePerson = Conn.define('RolePerson', {});
+
+const Role = Conn.define('Role', {
+  name: {
+    type: Sequelize.STRING
+  }
+});
+
+const RolePermission = Conn.define('RolePermission', {});
+
+const Permission = Conn.define('Permission', {
+  name: {
+    type: Sequelize.STRING
+  }
+});
 
 const Person = Conn.define('person', {
   email: {
@@ -65,10 +103,11 @@ Travel.belongsTo(Person, {onUpdate: 'cascade'});
 Person.hasMany(Token, {onDelete: 'cascade', onUpdate: 'cascade'});
 Token.belongsTo(Person, {onUpdate: 'cascade'});
 
-Permission.belongTo(Group, {onUpdate: 'cascade'});
-Group.hasMany(Permission, {onDelete: 'cascade', onUpdate: 'cascade'});
+Person.belongsToMany(Role, { through: { model: RolePerson }})
+Role.belongsToMany(Person, { through: { model: RolePerson }})
 
-Group.
+Role.belongsToMany(Permission, { through: { model: RolePermission }})
+Permission.belongsToMany(Person, { through: { model: RolePermission }})
 
 
 Conn.sync({ force: true }).then(()=> {

@@ -1,0 +1,20 @@
+version: "2"
+services:
+  gateway:
+      # should use env file / maybe ovewrite?
+      # should use extend file eg gateway.yml
+      # we can extend with network later
+    build: .
+    #command: npm start
+    #Env
+    links:
+      - postgres
+    volumes:
+      - .:/app
+      - /app
+    ports:
+      - 3000:3000
+  postgres:
+    image: postgres
+    ports:
+        - 5432:5432
