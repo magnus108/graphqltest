@@ -10,7 +10,7 @@ const Conn = new Sequelize(
   process.env.POSTGRES_PASSWORD,
   {
     dialect: 'postgres',
-    host: process.env.POSTGRES_PORT
+    host: process.env.POSTGRES_PORT_5432_TCP_ADDR
   }
 );
 
