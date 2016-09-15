@@ -1,9 +1,10 @@
 FROM node
 
-#EXPOSE 3000
+EXPOSE 3000
 
-#WORKDIR /app
-#ADD . /app
-#RUN npm install
+WORKDIR /app
+# should be pulled from outside container by github
+COPY . /app
+RUN npm install
 
 CMD [ "npm", "start" ]

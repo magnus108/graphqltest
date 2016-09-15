@@ -7,10 +7,10 @@ Faker.seed(100);
 const Conn = new Sequelize(
   'postgres',
   'postgres',
-  'mysecretpassword',
+  process.env.POSTGRES_PASSWORD,
   {
     dialect: 'postgres',
-    host: 'localhost'
+    host: process.env.POSTGRES_PORT
   }
 );
 
