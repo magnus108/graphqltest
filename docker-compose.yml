@@ -28,6 +28,7 @@ services:
       - back-tier
     environment:
       - POSTGRES_PASSWORD=${PASSWORD}
+
 volumes:
   postgres-data:
     driver: local
