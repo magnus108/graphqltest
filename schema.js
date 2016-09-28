@@ -227,9 +227,25 @@ const Query = new GraphQLObjectType({
           where: {
             type: JSONType
           },
+          uuid: {
+            type: GraphQLString
+          }
         },
-        resolve (root, args) {
-          return Db.models.travel.findAll(args);
+        async resolve (root, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'travels'){
+                return Db.models.travel.findAll(args);
+              }else{
+                throw new Error('permissions not allowed')
+              }
+            }
+          }
         }
       }
     };
@@ -247,16 +263,16 @@ const Mutation = new GraphQLObjectType({
           email: {
             type: new GraphQLNonNull(GraphQLString)
           },
-          travelId: {
+          groupId: {
             type: new GraphQLNonNull(GraphQLInt)
           }
         },
         async resolve (source, args) {
-          const {email, travelId} = args;
-          const travel = await Db.models.travel.findById(travelId);
-          const person = await travel.getPerson({where: {email: email}});
+          const {email, groupId} = args;
+          const group = await Db.models.group.findById(groupId);
+          const person = await group.getPeople({where: {email: email}});
           return Db.models.token.create({
-            uuid: person.email
+            uuid: person[0].email
           })
         }
       },

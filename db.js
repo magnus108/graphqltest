@@ -21,17 +21,17 @@ const Token = Conn.define('token', {
   }
 });
 
-const RolePerson = Conn.define('RolePerson', {});
+const RolePerson = Conn.define('rolePerson', {});
 
-const Role = Conn.define('Role', {
+const Role = Conn.define('role', {
   name: {
     type: Sequelize.STRING
   }
 });
 
-const RolePermission = Conn.define('RolePermission', {});
+const RolePermission = Conn.define('rolePermission', {});
 
-const Permission = Conn.define('Permission', {
+const Permission = Conn.define('permission', {
   type: {
     type: Sequelize.STRING
   },
@@ -56,9 +56,9 @@ const Person = Conn.define('person', {
 });
 
 
-const PersonGroup = Conn.define('PersonGroup', {});
+const PersonGroup = Conn.define('personGroup', {});
 
-const Group = Conn.define('Group', {});
+const Group = Conn.define('group', {});
 
 const Travel = Conn.define('travel', {
   id: {
@@ -100,6 +100,12 @@ Conn.sync({ force: true }).then(()=> {
       firstname: Faker.name.firstName(),
       email: Faker.internet.email()
     }).then(person => {
+      _.times(1, ()=> {
+        person.createToken({
+          uuid: person.email
+        })
+      })
+
       _.times(1, ()=> {
         return person.createRole({
           name: 'traveler'

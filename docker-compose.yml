@@ -2,6 +2,7 @@ version: "2"
 services:
   gateway:
     build: .
+    command: node_modules/.bin/nodemon index.js
     volumes:
       - .:/app
     ports:
