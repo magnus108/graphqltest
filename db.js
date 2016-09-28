@@ -14,40 +14,12 @@ const Conn = new Sequelize(
   }
 );
 
-//accesstoken
 const Token = Conn.define('token', {
   uuid: {
     type: Sequelize.STRING,
     allowNull: false
   }
 });
-
-
-/*
-//acl
-const Acl = Conn.define('acl', {
-  resource: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  property: {
-    type: Sequelize.STRING
-  },
-  accessType: {
-    type: Sequelize.STRING
-  },
-  permission: {
-    type: Sequelize.STRING
-  },
-  principalType: {
-    type: Sequelize.STRING
-  },
-  principalId: {
-    type: Sequlize.STRING
-  }
-}
-
-*/
 
 const RolePerson = Conn.define('RolePerson', {});
 
@@ -60,7 +32,10 @@ const Role = Conn.define('Role', {
 const RolePermission = Conn.define('RolePermission', {});
 
 const Permission = Conn.define('Permission', {
-  name: {
+  type: {
+    type: Sequelize.STRING
+  },
+  object: {
     type: Sequelize.STRING
   }
 });
@@ -80,6 +55,11 @@ const Person = Conn.define('person', {
   }
 });
 
+
+const PersonGroup = Conn.define('PersonGroup', {});
+
+const Group = Conn.define('Group', {});
+
 const Travel = Conn.define('travel', {
   id: {
     type: Sequelize.INTEGER,
@@ -98,16 +78,20 @@ const Travel = Conn.define('travel', {
 });
 
 
-Person.hasMany(Travel, {onDelete: 'cascade', onUpdate: 'cascade'});
-Travel.belongsTo(Person, {onUpdate: 'cascade'});
+Person.belongsToMany(Group, { through: { model: PersonGroup }});
+Group.belongsToMany(Person, { through: { model: PersonGroup }});
+
+Group.hasMany(Travel, {onDelete: 'cascade', onUpdate: 'cascade'});
+Travel.belongsTo(Group, {onUpdate: 'cascade'});
+
 Person.hasMany(Token, {onDelete: 'cascade', onUpdate: 'cascade'});
 Token.belongsTo(Person, {onUpdate: 'cascade'});
 
-Person.belongsToMany(Role, { through: { model: RolePerson }})
-Role.belongsToMany(Person, { through: { model: RolePerson }})
+Person.belongsToMany(Role, { through: { model: RolePerson }});
+Role.belongsToMany(Person, { through: { model: RolePerson }});
 
-Role.belongsToMany(Permission, { through: { model: RolePermission }})
-Permission.belongsToMany(Person, { through: { model: RolePermission }})
+Role.belongsToMany(Permission, { through: { model: RolePermission }});
+Permission.belongsToMany(Role, { through: { model: RolePermission }});
 
 
 Conn.sync({ force: true }).then(()=> {
@@ -116,12 +100,28 @@ Conn.sync({ force: true }).then(()=> {
       firstname: Faker.name.firstName(),
       email: Faker.internet.email()
     }).then(person => {
-      _.times(3, ()=> {
-        return person.createTravel({
-          destination: `${Faker.address.country()}`,
-          status: `${Faker.random.arrayElement(['full', 'dep.'])}`
-        });
-      });
+      _.times(1, ()=> {
+        return person.createRole({
+          name: 'traveler'
+        }).then(role => {
+          _.times(1, ()=> {
+            return role.createPermission({
+              type: 'query',
+              object: 'travels'
+            })
+          })
+        })
+      })
+      _.times(1, ()=> {
+        return person.createGroup().then(group => {
+          _.times(1, ()=> {
+            return group.createTravel({
+              destination: `${Faker.address.country()}`,
+              status: `${Faker.random.arrayElement(['full', 'dep.'])}`
+            })
+          })
+        })
+      })
     });
   });
 });
