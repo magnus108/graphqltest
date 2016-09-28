@@ -1,18 +1,9 @@
-# should use env file / maybe ovewrite?
-# should use extend file eg gateway.yml
-# we can extend with network later
-# backups migration and stuff can be done later?
-#command: npm start
 version: "2"
 services:
   gateway:
     build: .
-    networks:
-      - front-tier
-      - back-tier
     volumes:
       - .:/app
-      - /app
     ports:
       - 3000:3000
     links:
@@ -22,18 +13,5 @@ services:
       - POSTGRES_PASSWORD=${PASSWORD}
   postgres:
     image: postgres
-    volumes:
-        - postgresql:/var/lib/postgresql:rw
-    networks:
-      - back-tier
     environment:
       - POSTGRES_PASSWORD=${PASSWORD}
-
-volumes:
-  postgresql:
-    driver: local
-networks:
-  front-tier:
-    driver: bridge
-  back-tier:
-    driver: bridge
