@@ -32,11 +32,10 @@ const Role = Conn.define('role', {
 const RolePermission = Conn.define('rolePermission', {});
 
 const Permission = Conn.define('permission', {
-  type: {
-    type: Sequelize.STRING
-  },
   object: {
-    type: Sequelize.STRING
+    primaryKey: true,
+    type: Sequelize.STRING,
+    allowNull: false,
   }
 });
 
@@ -110,12 +109,34 @@ Conn.sync({ force: true }).then(()=> {
         return person.createRole({
           name: 'traveler'
         }).then(role => {
-          _.times(1, ()=> {
-            return role.createPermission({
-              type: 'query',
-              object: 'travels'
-            })
+          role.createPermission({
+            object: 'travels'
           })
+
+          role.createPermission({
+            object: 'group'
+          })
+
+          role.createPermission({
+            object: 'group:id/people'
+          })
+
+          role.createPermission({
+            object: 'travel:id/group'
+          })
+
+          role.createPermission({
+            object: 'group:id/travels'
+          })
+
+          role.createPermission({
+            object: 'person'
+          })
+
+          role.createPermission({
+            object: 'person:id/group'
+          })
+
         })
       })
       _.times(1, ()=> {

@@ -10,6 +10,8 @@ import {
   GraphQLNonNull
 } from 'graphql';
 
+//at bruge token og slå op heletiden kan være lidt slow?
+
 import Db from './db';
 
 const astToJson = {
@@ -62,6 +64,63 @@ const JSONType = new GraphQLScalarType({
   }
 });
 
+const Group = new GraphQLObjectType({
+  name: 'Group',
+  description: 'Describes a group',
+  fields () {
+    return {
+      travels: {
+        type: new GraphQLList(Travel),
+        args:{
+          uuid: {
+            type: GraphQLString
+          }
+        },
+        async resolve (group, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'group:id/travels'){
+                const travels = await group.getTravels();
+                return travels;
+              }
+            }
+            throw new Error('permissions not allowed')
+          }
+        }
+      },
+      people: {
+        type: new GraphQLList(Person),
+        args:{
+          uuid: {
+            type: GraphQLString
+          }
+        },
+        async resolve (group, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'group:id/people'){
+                const people = await group.getPeople();
+                return people;
+              }
+            }
+            throw new Error('permissions not allowed')
+          }
+        }
+      }
+    }
+  }
+})
+
 const Travel = new GraphQLObjectType({
   name: 'Travel',
   description: 'Describes a travel',
@@ -85,10 +144,27 @@ const Travel = new GraphQLObjectType({
           return travel.status;
         }
       },
-      person: {
-        type: Person,
-        resolve (travel) {
-          return travel.getPerson();
+      group: {
+        type: Group,
+        args:{
+          uuid: {
+            type: GraphQLString
+          }
+        },
+        async resolve (travel, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'travel:id/group'){
+                return travel.getGroup();
+              }
+            }
+            throw new Error('permissions not allowed')
+          }
         }
       }
     };
@@ -163,8 +239,8 @@ const Person = new GraphQLObjectType({
           return person.firstname;
         }
       },
-      travels: {
-        type: new GraphQLList(Travel),
+      groups: {
+        type: new GraphQLList(Group),
         args: {
           limit: {
             type: GraphQLInt
@@ -177,10 +253,25 @@ const Person = new GraphQLObjectType({
           },
           where: {
             type: JSONType
+          },
+          uuid: {
+            type: GraphQLString
           }
         },
-        resolve (person, args) {
-          return person.getTravels(args);
+        async resolve (person, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'person:id/group'){
+                return person.getGroups();
+              }
+            }
+            throw new Error('permissions not allowed')
+          }
         }
       }
     };
@@ -192,6 +283,29 @@ const Query = new GraphQLObjectType({
   description: 'Root query object',
   fields: () => {
     return {
+      groups: {
+        type: new GraphQLList(Group),
+        args: {
+          uuid: {
+            type: GraphQLString
+          }
+        },
+        async resolve (root, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'group'){
+                return Db.models.group.findAll(args);
+              }
+            }
+            throw new Error('permissions not allowed');
+          }
+        }
+      },
       people: {
         type: new GraphQLList(Person),
         args: {
@@ -207,9 +321,24 @@ const Query = new GraphQLObjectType({
           where: {
             type: JSONType
           },
+          uuid: {
+            type: GraphQLString
+          }
         },
-        resolve (root, args) {
-          return Db.models.person.findAll(args);
+        async resolve (root, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'person'){
+                return Db.models.person.findAll(args);
+              }
+            }
+            throw new Error('permissions not allowed');
+          }
         }
       },
       travels: {
@@ -241,10 +370,9 @@ const Query = new GraphQLObjectType({
             for( let permission of permissions ){
               if(permission.object == 'travels'){
                 return Db.models.travel.findAll(args);
-              }else{
-                throw new Error('permissions not allowed')
               }
             }
+            throw new Error('permissions not allowed');
           }
         }
       }
