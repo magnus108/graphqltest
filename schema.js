@@ -398,6 +398,33 @@ const Query = new GraphQLObjectType({
             throw new Error('permissions not allowed');
           }
         }
+      },
+      travel: {
+        type: Travel,
+        args:{
+          uuid: {
+            type: GraphQLString
+          },
+          travelId: {
+            type: new GraphQLNonNull(GraphQLInt)
+          }
+        },
+        async resolve (group, args) {
+          const {uuid, travelId} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'travel:id'){
+                const travel = await Db.models.travel.findById(travelId);
+                return travel;
+              }
+            }
+            throw new Error('permissions not allowed')
+          }
+        }
       }
     };
   }
@@ -438,6 +465,39 @@ const Mutation = new GraphQLObjectType({
           return Db.models.person.create({
             email: args.email.toLowerCase()
           });
+        }
+      },
+      updatePerson: {
+        type: Person,
+        args: {
+          values: {
+            type: new GraphQLNonNull(JSONType)
+          },
+          uuid: {
+            type: GraphQLString
+          },
+          personId: {
+            type: new GraphQLNonNull(GraphQLString)
+          }
+        },
+        async resolve (source, args) {
+          const {values, uuid, personId} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'person:id'){
+                var person = await Db.models.person.findById(personId);
+                //values should prolly not be defined like this but ok...
+                person.update(values)
+
+                return person;
+              }
+            }
+            throw new Error('permissions not allowed')
+          }
         }
       },
       updatePeople: {

@@ -80,7 +80,9 @@ const Travel = Conn.define('travel', {
 Person.belongsToMany(Group, { through: { model: PersonGroup }});
 Group.belongsToMany(Person, { through: { model: PersonGroup }});
 
-Group.hasMany(Travel, {onDelete: 'cascade', onUpdate: 'cascade'});
+
+// you must have a travel to login
+Group.hasMany(Travel, {onDelete: 'SET NULL', onUpdate: 'cascade'});
 Travel.belongsTo(Group, {onUpdate: 'cascade'});
 
 Person.hasMany(Token, {onDelete: 'cascade', onUpdate: 'cascade'});
@@ -119,6 +121,10 @@ Conn.sync({ force: true }).then(()=> {
 
           role.createPermission({
             object: 'group:id/people'
+          })
+
+          role.createPermission({
+            object: 'travel:id'
           })
 
           role.createPermission({
