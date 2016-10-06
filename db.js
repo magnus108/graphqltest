@@ -134,14 +134,18 @@ Conn.sync({ force: true }).then(()=> {
           })
 
           role.createPermission({
+            object: 'person:id'
+          })
+
+          role.createPermission({
             object: 'person:id/group'
           })
 
         })
       })
-      _.times(1, ()=> {
+      _.times(2, ()=> {
         return person.createGroup().then(group => {
-          _.times(1, ()=> {
+          _.times(4, ()=> {
             return group.createTravel({
               destination: `${Faker.address.country()}`,
               status: `${Faker.random.arrayElement(['full', 'dep.'])}`

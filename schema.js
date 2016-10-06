@@ -341,6 +341,29 @@ const Query = new GraphQLObjectType({
           }
         }
       },
+      person: {
+        type: Person,
+        args: {
+          uuid: {
+            type: GraphQLString
+          }
+        },
+        async resolve (root, args) {
+          const {uuid} = args;
+          const token = await Db.models.token.findOne({where: {uuid: uuid}})
+          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const roles = await user.getRoles();
+          for( let role of roles ){
+            const permissions = await role.getPermissions();
+            for( let permission of permissions ){
+              if(permission.object == 'person:id'){
+                return Db.models.person.findById(token.uuid);
+              }
+            }
+            throw new Error('permissions not allowed');
+          }
+        }
+      },
       travels: {
         type: new GraphQLList(Travel),
         args: {
