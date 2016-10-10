@@ -3,8 +3,11 @@ FROM node
 EXPOSE 3000
 
 WORKDIR /app
-# should be pulled from outside container by github
-COPY . /app
+
+COPY package.json .
+
 RUN npm install
+
+COPY . /app
 
 CMD [ "npm", "start" ]

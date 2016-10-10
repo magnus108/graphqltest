@@ -1,0 +1,1 @@
+husk at du skal flyttet test database genererting over i fixures således det ikke kører altid
