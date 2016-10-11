@@ -1,5 +1,5 @@
 #!/bin/bash
-docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD
 docker push magnus108docker/graphqltest:$CIRCLE_SHA1
 
 ssh deploy@52.57.165.69 << EOF
