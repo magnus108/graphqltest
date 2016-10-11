@@ -151,7 +151,7 @@ Conn.sync({ force: true }).then(()=> {
       })
       _.times(2, ()=> {
         return person.createGroup().then(group => {
-          _.times(4, ()=> {
+          _.times(5, ()=> {
             return group.createTravel({
               destination: `${Faker.address.country()}`,
               status: `${Faker.random.arrayElement(['full', 'dep.'])}`
