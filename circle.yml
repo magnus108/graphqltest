@@ -1,0 +1,13 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+      - docker build --rm=false -t magnus108/graphqltest:$CIRCLE_SHA1 .
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./deploy.sh
