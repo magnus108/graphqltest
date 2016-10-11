@@ -9,6 +9,6 @@ docker pull magnus108docker/graphqltest:latest
 #docker rmi willrstern/sample-node:current || true
 #docker tag willrstern/sample-node:latest willrstern/sample-node:current
 
-docker run -d --net app --restart always --name graphqltest -p 3000:3000 magnus108docker/graphqltest:latest
+docker run -d --restart always --name graphqltest -p 3000:3000 magnus108docker/graphqltest:latest
 
 EOF
