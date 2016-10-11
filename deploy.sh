@@ -2,7 +2,7 @@
 docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD
 docker push magnus108docker/graphqltest:$CIRCLE_SHA1
 
-ssh deploy@52.57.165.69 << EOF
+ssh ubuntu@52.57.165.69 << EOF
 docker pull magnus108docker/graphqltest:latest
 #docker stop web || true
 #docker rm web || true
