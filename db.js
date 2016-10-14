@@ -1,8 +1,5 @@
+//skal ikke bruge den her fil mere models ligger et andet sted
 import Sequelize from 'sequelize';
-import Faker from 'faker';
-import _ from 'lodash';
-
-Faker.seed(100);
 
 const Conn = new Sequelize(
   'postgres',
@@ -93,74 +90,5 @@ Role.belongsToMany(Person, { through: { model: RolePerson }});
 
 Role.belongsToMany(Permission, { through: { model: RolePermission }});
 Permission.belongsToMany(Role, { through: { model: RolePermission }});
-
-
-Conn.sync({ force: true }).then(()=> {
-  _.times(1, ()=> {
-    return Person.create({
-      firstname: Faker.name.firstName(),
-      email: Faker.internet.email()
-    }).then(person => {
-      _.times(1, ()=> {
-        person.createToken({
-          uuid: person.email
-        })
-      })
-
-      _.times(1, ()=> {
-        return person.createRole({
-          name: 'traveler'
-        }).then(role => {
-          role.createPermission({
-            object: 'travels'
-          })
-
-          role.createPermission({
-            object: 'group'
-          })
-
-          role.createPermission({
-            object: 'group:id/people'
-          })
-
-          role.createPermission({
-            object: 'travel:id'
-          })
-
-          role.createPermission({
-            object: 'travel:id/group'
-          })
-
-          role.createPermission({
-            object: 'group:id/travels'
-          })
-
-          role.createPermission({
-            object: 'person'
-          })
-
-          role.createPermission({
-            object: 'person:id'
-          })
-
-          role.createPermission({
-            object: 'person:id/group'
-          })
-
-        })
-      })
-      _.times(2, ()=> {
-        return person.createGroup().then(group => {
-          _.times(5, ()=> {
-            return group.createTravel({
-              destination: `${Faker.address.country()}`,
-              status: `${Faker.random.arrayElement(['full', 'dep.'])}`
-            })
-          })
-        })
-      })
-    });
-  });
-});
 
 export default Conn;

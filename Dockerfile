@@ -4,7 +4,7 @@ EXPOSE 3000
 
 WORKDIR /app
 
-ADD package.json /app
+ADD package.json /app/package.json
 
 RUN npm install
 
