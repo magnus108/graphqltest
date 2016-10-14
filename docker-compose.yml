@@ -3,16 +3,29 @@ services:
   gateway:
     build: .
     command: node_modules/.bin/nodemon index.js
+    networks:
+      - back-tier
     volumes:
       - .:/app
+      - /app/node_modules
     ports:
       - 3000:3000
-    links:
+    depends_on:
       - postgres
     environment:
-      - POSTGRES_PORT_5432_TCP_ADDR=postgres
-      - POSTGRES_PASSWORD=${PASSWORD}
+      - POSTGRES_ADDR=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
   postgres:
     image: postgres
+    networks:
+      - back-tier
     environment:
-      - POSTGRES_PASSWORD=${PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+networks:
+  back-tier:
+    driver: bridge
