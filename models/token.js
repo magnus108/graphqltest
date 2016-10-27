@@ -1,9 +1,13 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
-  var Token = sequelize.define('Token', {
-    uuid: {
+  var Token = sequelize.define('Tokens', {
+    Uuid: {
       allowNull: false,
       type: DataTypes.STRING
+    },
+    PersonEmail: {
+      allowNull: false,
+      type: DataTypes.INTEGER
     }
   }, {
     classMethods: {

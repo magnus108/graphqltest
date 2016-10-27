@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        Person.hasMany(models.Token, {onDelete: 'cascade', onUpdate: 'cascade'})
+        Person.hasMany(models.Tokens, {onDelete: 'cascade', onUpdate: 'cascade'})
       }
     }
   });

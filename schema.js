@@ -345,14 +345,17 @@ const Query = new GraphQLObjectType({
       person: {
         type: Person,
         args: {
-          uuid: {
+          Uuid: {
             type: GraphQLString
           }
         },
         async resolve (root, args) {
-          const {uuid} = args;
-          const token = await Db.models.token.findOne({where: {uuid: uuid}})
-          const user = await Db.models.person.findOne({where: {email: token.uuid}})
+          const {Uuid} = args;
+          console.log("msaadDDDDDDDDDDDDDDDYYYYYYYyn")
+          const token = await Db.Tokens.findOne({where: {Uuid: Uuid}})
+          console.log("maYYYYYYYYYYyn")
+          const user = await Db.Person.findOne({where: {email: token.uuid}})
+          console.log("man")
           const roles = await user.getRoles();
           for( let role of roles ){
             const permissions = await role.getPermissions();

@@ -8,7 +8,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      uuid: {
+      Uuid: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      PersonEmail: {
         allowNull: false,
         type: Sequelize.STRING
       },
