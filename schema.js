@@ -11,8 +11,9 @@ import {
 } from 'graphql';
 
 //at bruge token og slå op heletiden kan være lidt slow?
+//ka nok godt slette astToJson men det er ret cool
 
-import Db from './db';
+import Db from './models/index';
 
 const astToJson = {
   [Kind.INT](ast) {

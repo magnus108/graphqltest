@@ -8,7 +8,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        Token.belongsTo(Person, {onUpdate: 'cascade'})
+        Token.belongsTo(models.Person, {onUpdate: 'cascade'})
       }
     }
   });
